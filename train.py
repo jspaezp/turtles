@@ -5,7 +5,7 @@ from detectron2 import model_zoo
 
 from detectron2.engine import DefaultTrainer
 import click
-
+from detectron2.evaluation import COCOEvaluator
 
 def config_model(
     modelzoo_file="COCO-Detection/retinanet_R_101_FPN_3x.yaml",
@@ -25,7 +25,9 @@ def config_model(
 
     cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 300  # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 500  
+    # 300 iterations seems good enough for the balloons toy dataset
+    # you will need to train longer for a practical dataset
 
     """
     # Section specific for FASTER-RCNN

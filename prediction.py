@@ -74,3 +74,42 @@ def predict_file(img: Path, predictor: DefaultPredictor):
     outputs = predictor(im)
     return outputs
 
+
+def get_top_hits(df):
+    df_ui = df.reset_index()
+    idmaxes = df_ui.groupby(["Image_ID"])["score"].idxmax()
+    top_hit_df = df_ui.loc[idmaxes]
+    top_hit_df = top_hit_df.reset_index()
+
+    return(top_hit_df)
+
+
+def pandas_iou(joint_df):
+    # boxA is actually the predictions - a list of [[x, y, w, h], ...]
+    # boxB is the targets, same format
+
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = pd.concat([joint_df["x"], joint_df['x_pred']], axis=1).max(axis=1)
+    yA = pd.concat([joint_df["y"], joint_df['y_pred']], axis=1).max(axis=1)
+
+    xB = pd.concat([
+                    joint_df["x"] + joint_df["w"],
+                    joint_df["x_pred"] + joint_df["w_pred"]], axis=1).min(axis=1) # x+w 
+    yB = pd.concat([
+                    joint_df["y"] + joint_df["h"],
+                    joint_df["y_pred"] + joint_df["h_pred"]], axis=1).min(axis=1) # y+h
+
+    eps = 1e-5 # To avoid division by 0
+
+    # area of intersection
+    interArea = np.clip((xB - xA + eps), 0, 1) * np.clip((yB - yA + eps), 0, 1)
+
+    # compute the area of both rectangles
+
+    boxAArea = (joint_df["w"] + eps) * (joint_df["h"] + eps) # w*h
+    boxBArea = (joint_df["w_pred"] + eps) * (joint_df["h_pred"]+ eps) # w*h
+
+    # IOU
+    iou = interArea / (boxAArea + boxBArea - interArea)
+
+    return(iou)

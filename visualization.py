@@ -7,7 +7,7 @@ import cv2
 #    dataset_dicts = get_balloon_dicts("balloon/train")
 
 
-def visualize_dataset(dataset_dicts: List[dict], metadata: Metadata, num: int):
+def visualize_dataset(dataset_dicts: List[dict], metadata: MetadataCatalog, num: int):
     out = []
     for d in random.sample(dataset_dicts, num):
         img = cv2.imread(d["file_name"])
