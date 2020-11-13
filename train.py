@@ -9,8 +9,8 @@ import click
 
 def config_model(
     modelzoo_file="COCO-Detection/retinanet_R_101_FPN_3x.yaml",
-    train_dataset="turtles_train",
-    test_dataset="turtles_test",
+    train_dataset="turtle_train",
+    test_dataset="turtle_test",
 ):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(modelzoo_file))
@@ -52,6 +52,7 @@ def config_model(
 
 
 def make_trainer(cfg):
+    # WARNING [11/13 20:09:42 d2.engine.defaults]: No evaluator found. Use `DefaultTrainer.test(evaluators=)`, or implement its `build_evaluator` method.
     trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
     return trainer
@@ -69,3 +70,4 @@ def cli(split_dir, out_dir):
 
 if __name__ == "__main__":
     from t_io import register_datasets
+    cli()
