@@ -93,9 +93,7 @@ def prediction_to_df(outputs):
     return df
 
 
-Prediction = namedtuple(
-    "Prediction", ["prediction_output", "prediction_visualization"]
-)
+Prediction = namedtuple("Prediction", ["prediction_output", "prediction_visualization"])
 
 
 def predict_file(img: Path, predictor: DefaultPredictor, config: CfgNode) -> Prediction:
