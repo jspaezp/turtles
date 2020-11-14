@@ -93,7 +93,7 @@ def prediction_to_df(outputs):
     return df
 
 
-Prediction = col.namedtuple(
+Prediction = namedtuple(
     "Prediction", ["prediction_output", "prediction_visualization"]
 )
 
