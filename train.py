@@ -64,11 +64,11 @@ def make_trainer(cfg):
             output_folder = str(Path(cfg.OUTPUT_DIR) / "inference")
         return COCOEvaluator(dataset_name, cfg, True, output_folder)
 
-    setattr(DefaultTrainer, "build_evaluator", classmethod(bb_from_cw))
+    setattr(DefaultTrainer, "build_evaluator", classmethod(build_evaluator))
 
     trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
-    
+
     return trainer
 
 
