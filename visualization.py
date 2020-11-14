@@ -20,7 +20,9 @@ def visualize_dataset(dataset_dicts: List[dict], metadata: MetadataCatalog, num:
 
 
 def visualize_predictions(im, pred_outputs, cfg):
-    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
+    v = Visualizer(
+        im[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2
+    )
     out = v.draw_instance_predictions(pred_outputs["instances"].to("cpu"))
     out = out.get_image()[:, :, ::-1]
     # cv2_imshow(out)

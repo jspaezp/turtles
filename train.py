@@ -7,15 +7,19 @@ from detectron2.engine import DefaultTrainer
 import click
 from detectron2.evaluation import COCOEvaluator
 
+
 def config_model(
     modelzoo_file="COCO-Detection/retinanet_R_101_FPN_3x.yaml",
     train_dataset="turtle_train",
     test_dataset="turtle_test",
+    register_datasets=True,
 ):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(modelzoo_file))
-    cfg.DATASETS.TRAIN = (train_dataset,)
-    cfg.DATASETS.TEST = (test_dataset,)
+
+    if register_datasets:
+        cfg.DATASETS.TRAIN = (train_dataset,)
+        cfg.DATASETS.TEST = (test_dataset,)
 
     cfg.DATALOADER.NUM_WORKERS = 2
 
@@ -25,7 +29,7 @@ def config_model(
 
     cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 500  
+    cfg.SOLVER.MAX_ITER = 500
     # 300 iterations seems good enough for the balloons toy dataset
     # you will need to train longer for a practical dataset
 
@@ -47,7 +51,7 @@ def config_model(
     cfg.MODEL.RETINANET.BBOX_REG_LOSS_TYPE = "giou"  # Default smooth_l1
 
     cfg.INPUT.CROP.SIZE = [0.7, 1]
-    cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS = False # Defaults to False
+    cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS = False  # Defaults to False
 
     Path(cfg.OUTPUT_DIR).mkdir(exist_ok=True)
     return cfg
@@ -72,4 +76,5 @@ def cli(split_dir, out_dir):
 
 if __name__ == "__main__":
     from t_io import register_datasets
+
     cli()
