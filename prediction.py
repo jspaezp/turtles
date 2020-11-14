@@ -42,7 +42,21 @@ def predict_submission(sub_file: Path, predictor: DefaultPredictor, img_path: Pa
         bar.next()
     
     bar.finish()
-    return pd.concat(outs, axis = 0)
+    out_df = pd.concat(outs, axis = 0)
+
+    # Keep only the highest scoring hit
+    top_hit_df = get_top_hits(out_df)
+
+    # This section takes care of ordering the output df in the same
+    # order as the original submission df
+    top_hit_df=top_hit_df.set_index("Image_ID").reindex(columns= ['Image_ID', 'x', 'y','w', 'h'])
+
+    top_hit_df = top_hit_df.loc[df['Image_ID']]
+    del top_hit_df['Image_ID']
+
+    top_hit_df = top_hit_df.reset_index()
+
+    return top_hit_df
         
 
 
