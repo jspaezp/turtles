@@ -157,8 +157,8 @@ def pandas_iou(joint_df):
 
 
 @click.command()
-@click.parameter("--in_img", type=click.Path(dir_okay=False, exists=True))
-@click.patameter("--out_img", type=click.Path(exists=False))
+@click.option("--in_img", type=click.Path(dir_okay=False, exists=True))
+@click.option("--out_img", type=click.Path(exists=False))
 def cli(in_img, out_img):
     in_img = Path(in_img)
     assert in_img.is_file
