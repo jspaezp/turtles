@@ -19,7 +19,7 @@ def get_predictor(cfg=train.config_model(), model_name="model_final.pth"):
 
     cfg.MODEL.WEIGHTS = str(model_path)
 
-    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.7  # used for retinanet
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.1  # used for retinanet, I use a pretty loose criteria becuase we keep only the best one ...
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = (
         0.7  # set a custom testing threshold, used for maskrcnn
     )
@@ -55,7 +55,7 @@ def predict_submission(sub_file: Path, predictor: DefaultPredictor, img_path: Pa
 
     out_df = pd.concat(outs, axis=0)
     out_df = out_df.drop_duplicates()
-    
+
     # Keep only the highest scoring hit
     top_hit_df = get_top_hits(out_df)
 
@@ -64,7 +64,7 @@ def predict_submission(sub_file: Path, predictor: DefaultPredictor, img_path: Pa
     df = df.set_index("Image_ID").join(top_hit_df.set_index("Image_ID"))
 
     df = df.reset_index()
-    df = df[['Image_ID', 'x', 'y', 'w', 'h', 'score']].copy()
+    df = df[["Image_ID", "x", "y", "w", "h", "score"]].copy()
 
     return df
 
