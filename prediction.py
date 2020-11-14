@@ -19,7 +19,7 @@ def get_predictor(cfg=train.config_model(), model_name="model_final.pth"):
 
     cfg.MODEL.WEIGHTS = str(model_path)
 
-    cfg.RETINANET.SCORE_THRESH_TEST = 0.7  # used for retinanet
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.7  # used for retinanet
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = (
         0.7  # set a custom testing threshold, used for maskrcnn
     )
@@ -30,12 +30,16 @@ def get_predictor(cfg=train.config_model(), model_name="model_final.pth"):
 def predict_submission(sub_file: Path, predictor: DefaultPredictor, img_path: Path):
     assert img_path.is_dir()
     df = pd.read_csv(str(sub_file))
+
+    del df["x"]
+    del df["y"]
+    del df["h"]
+    del df["w"]
+
     outs = []
 
     # TODO: this can probably be optimized passing a tensor and not
     # in a for loop ...
-
-    bar = Bar("Processing", max=len(df))
 
     for base_filename in df["Image_ID"]:
         file_name = img_path / f"{base_filename}.JPG"
@@ -48,26 +52,21 @@ def predict_submission(sub_file: Path, predictor: DefaultPredictor, img_path: Pa
         pred_df["Image_ID"] = base_filename
 
         outs.append(pred_df)
-        bar.next()
 
-    bar.finish()
     out_df = pd.concat(outs, axis=0)
-
+    out_df = out_df.drop_duplicates()
+    
     # Keep only the highest scoring hit
     top_hit_df = get_top_hits(out_df)
 
     # This section takes care of ordering the output df in the same
     # order as the original submission df
-    top_hit_df = top_hit_df.set_index("Image_ID").reindex(
-        columns=["Image_ID", "x", "y", "w", "h", "score"]
-    )
+    df = df.set_index("Image_ID").join(top_hit_df.set_index("Image_ID"))
 
-    top_hit_df = top_hit_df.loc[df["Image_ID"]]
-    del top_hit_df["Image_ID"]
+    df = df.reset_index()
+    df = df[['Image_ID', 'x', 'y', 'w', 'h', 'score']].copy()
 
-    top_hit_df = top_hit_df.reset_index()
-
-    return top_hit_df
+    return df
 
 
 def prediction_to_df(outputs):

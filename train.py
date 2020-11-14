@@ -59,9 +59,6 @@ def config_model(
 
 def make_trainer(cfg):
     # WARNING [11/13 20:09:42 d2.engine.defaults]: No evaluator found. Use `DefaultTrainer.test(evaluators=)`, or implement its `build_evaluator` method.
-    trainer = DefaultTrainer(cfg)
-    trainer.resume_or_load(resume=False)
-
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
         if output_folder is None:
             output_folder = str(Path(cfg.OUTPUT_DIR) / "inference")
@@ -69,6 +66,9 @@ def make_trainer(cfg):
 
     setattr(DefaultTrainer, "build_evaluator", classmethod(bb_from_cw))
 
+    trainer = DefaultTrainer(cfg)
+    trainer.resume_or_load(resume=False)
+    
     return trainer
 
 
