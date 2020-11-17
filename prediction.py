@@ -156,14 +156,20 @@ def pandas_iou(joint_df):
 @click.command()
 @click.option("--in_img", type=click.Path(dir_okay=False, exists=True))
 @click.option("--out_img", type=click.Path(exists=False))
-def cli(in_img, out_img):
+@click.option("--model_name")
+def cli(in_img, out_img, model_name = None):
     in_img = Path(in_img)
     assert in_img.is_file
 
     cfg = train.config_model(register_datasets=False)
-    predictor = get_predictor(cfg=cfg)
-    _, prediction_visualization = predict_file(img, predictor, cfg)
 
+    if model_name is None:
+        model_name = "model_final.pth"
+
+    predictor = get_predictor(cfg=cfg, model_name=model_name)
+    _, prediction_visualization = predict_file(in_img, predictor, cfg)
+
+    click.echo(f"Writting image to {str(out_img)}")
     cv2.imwrite(str(out_img), prediction_visualization)
 
 
